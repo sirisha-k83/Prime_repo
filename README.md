@@ -1,11 +1,11 @@
 # Prime_repo
-Amazon Prime Video Clone - CI/CD Pipeline 
+Amazon Prime Video Clone - CI Pipeline 
 
 Overview:
-This project focuses on implementing a Continuous Integration (CI) and Continuous Deployment (CD) pipeline using Jenkins. The goal is to deploy a clone of the Amazon Prime Video application to Azure Container Registry (ACR) while incorporating security vulnerability scanning using Trivy. The pipeline also integrates SonarQube for static code analysis and quality gate checks.
+This project focuses on implementing a Continuous Integration (CI)  pipeline using Jenkins. The goal is to deploy a clone of the Amazon Prime Video application to Azure Container Registry (ACR) while incorporating security vulnerability scanning using Trivy. The pipeline also integrates SonarQube for static code analysis and quality gate checks.
 
 Tools & Technologies:
-Jenkins: An automation server used to manage the CI/CD pipeline.
+Jenkins: An automation server used to manage the CI pipeline.
 SonarQube: A platform for continuous inspection of code quality and security vulnerabilities.
 Trivy: A security vulnerability scanner specifically for Docker images.
 Docker: A containerization platform used to package the application into lightweight containers.
@@ -24,14 +24,12 @@ Trivy Security Scan:
 Scans the application’s directory for known vulnerabilities using Trivy. The scan results are stored in a file named trivy.txt.
 Build Docker Image:
 This stage builds the Docker image for the application using the Dockerfile found in the repository. The image is tagged based on the user-defined ACR repository name.
-Create ACR Repository (if it doesn’t exist):
-The pipeline checks whether the specified ACR repository exists in the Azure account. If not, it creates the repository automatically. This step ensures that the Docker image has a valid destination for storage.
 Tag & Push Docker Image to ACR:
 The Docker image is tagged with both a unique build number and the latest tag. Afterward, the image is pushed to the specified ACR repository in the user's Az account. 
 
 
 INFRASTRUCTURE CONFIGURATION:
-EC2 Instance:
+Virtual Machine:
 Operating System: Ubuntu 24.04
 Security Group:
 SSH: Port 22
@@ -63,10 +61,9 @@ SSH Agent:
 Manages SSH credentials for remote server access within Jenkins pipelines.
 Eclipse Temurin Installer:
 Used to install OpenJDK within Jenkins.
-Prometheus Metrics:
-Enables Jenkins to expose metrics for monitoring and alerting.
 
 SONARQUBE CONFIGURATION:
+Is run on a docker instance
 SonarQube Webhook:
 The SonarQube webhook is used to send analysis results back to Jenkins.
 Configuration:
@@ -78,7 +75,6 @@ Generated token to authenticate Jenkins with SonarQube for analysis and quality 
 
 Credentials:
 SonarQube Token: Used to authenticate and interact Jenkins with SonarQube.
-AWS credentials (Access Key and Secret Key): These credentials are used to authenticate and interact Jenkins with AWS, to push the Docker Image to AWS ECR.
 Jenkins SonarQube System Configuration:
 Helps to store SonarQube server details globally in Jenkins instead of specifying them in each pipeline script.
 Configuration:
@@ -108,7 +104,7 @@ Source Code Fetching: The pipeline begins by pulling the code from GitHub.
 Static Analysis: SonarQube performs code quality and security checks on the pulled code.
 Build & Testing: The application’s dependencies are installed, and the application is packaged into a Docker image.
 Security Scanning: Trivy scans the Docker image for vulnerabilities and produces a report.
-Deployment: The final Docker image is pushed to AWS ECR, making it ready for deployment to AWS ECS or EKS. The application is deployed using ArgoCD. The pods are monitored using Grafana & Prometheus.
+Docker Hub: Push the image to Docker Hub and ACR
 
 Conclusion:
-This project provides a comprehensive CI/CD pipeline from source code management to deployment with integrated code quality checks and security scans. Using AWS ECR ensures that the Dockerized application is securely stored and readily available for deployment in a scalable AWS environment. The application is deployed using ArgoCD. The pods are monitored using Grafana & Prometheus.
+This project provides a comprehensive CI pipeline from source code management to deployment with integrated code quality checks and security scans. Using ACR ensures that the Dockerized application is securely stored and readily available for deployment . 
