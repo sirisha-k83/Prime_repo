@@ -1,0 +1,48 @@
+#! /usr/bin/env bash
+
+echo "Running cloud-init script..."
+
+# Update package list
+apt update -y
+
+apt upgrade -y
+
+# Install Nginx
+apt install nginx -y
+echo "Hello from Terraform!" > /var/www/html/index.html
+
+# Install Temurin JDK 17
+wget -O - https://packages.adoptium.net/artifactory/api/gpg/key/public | tee /etc/apt/keyrings/adoptium.asc
+echo "deb [signed-by=/etc/apt/keyrings/adoptium.asc] https://packages.adoptium.net/artifactory/deb $(awk -F= '/^VERSION_CODENAME/{print$2}' /etc/os-release) main" | tee /etc/apt/sources.list.d/adoptium.list
+apt update -y
+apt install temurin-17-jdk -y
+/usr/bin/java --version
+
+apt install maven
+
+# Install Jenkins
+curl -fsSL https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key | tee /usr/share/keyrings/jenkins-keyring.asc > /dev/null
+echo deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc] https://pkg.jenkins.io/debian-stable binary/ | tee /etc/apt/sources.list.d/jenkins.list > /dev/null
+apt-get update -y
+apt-get install jenkins -y
+systemctl enable jenkins
+systemctl start jenkins
+
+# Install Docker
+apt-get install docker.io -y
+usermod -aG docker ubuntu
+systemctl enable docker
+systemctl start docker
+chmod 777 /var/run/docker.sock
+
+# Run SonarQube Container
+docker run -d --name sonar -p 9000:9000 sonarqube:lts-community
+
+# Install Trivy
+apt-get install wget apt-transport-https gnupg lsb-release -y
+wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | apt-key add -
+echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | tee -a /etc/apt/sources.list.d/trivy.list
+apt-get update -y
+apt-get install trivy -y
+
+echo "Cloud-init script execution completed."

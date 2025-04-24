@@ -1,0 +1,42 @@
+Solution: Use Persistent Storage for SonarQube
+To ensure that your SonarQube data is not lost after a VM restart, you need to use Docker volumes or bind mounts.
+
+Step 1: Stop and Remove the Existing SonarQube Container
+Check the running container:
+
+
+Edit
+docker ps -a
+Stop and remove it:
+
+
+docker stop sonarqube
+docker rm sonarqube
+Step 2: Re-run SonarQube with Persistent Volumes
+Use Docker volumes to store the data:
+
+
+docker run -d --name sonarqube \
+  -p 9000:9000 \
+  -v sonarqube_data:/opt/sonarqube/data \
+  -v sonarqube_logs:/opt/sonarqube/logs \
+  -v sonarqube_extensions:/opt/sonarqube/extensions \
+  sonarqube
+-v sonarqube_data:/opt/sonarqube/data → Stores analysis data
+-v sonarqube_logs:/opt/sonarqube/logs → Stores logs
+-v sonarqube_extensions:/opt/sonarqube/extensions → Stores installed plugins
+Step 3: Verify Volumes Are Persisting
+Check if the volumes are created:
+
+
+docker volume ls
+If you see sonarqube_data, sonarqube_logs, and sonarqube_extensions, then the data will persist even after a VM restart.
+
+Step 4: Restart Your VM and Check SonarQube
+After restarting your VM, run:
+
+
+docker start sonarqube
+docker ps
+Then access SonarQube at:
+👉 http://<your-vm-ip>:9000
